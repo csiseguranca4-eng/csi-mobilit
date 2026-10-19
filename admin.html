@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSI Mobility · Comando</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              csi: { dark: "#0b0f19", card: "#131827", blue: "#1e3a8a", red: "#dc2626" },
+            },
+            fontFamily: {
+              display: ["Barlow Condensed", "sans-serif"],
+              sans: ["Inter", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="bg-csi-dark text-slate-200 font-sans antialiased" data-page="admin">
+    <div class="noise"></div>
+    <header class="sticky top-0 z-40 border-b border-white/5 bg-[#0b0f19]/90 backdrop-blur">
+      <div class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+        <a href="./index.html" class="flex min-w-0 items-center gap-3">
+          <span class="csi-logo-wrap"><img src="./logo-csi.png" alt="CSI International Security Consulting" class="csi-logo" /></span>
+          <div class="min-w-0">
+            <p class="brand-kicker truncate text-[10px] uppercase tracking-[0.22em] text-csi-red">International Security Consulting</p>
+            <p class="font-display text-lg leading-none tracking-wide text-white">CENTRO DE COMANDO</p>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-2 text-xs sm:flex">
+          <a class="rounded-full px-3 py-1.5 text-slate-400 hover:text-white" href="./cliente.html">Cliente</a>
+          <a class="rounded-full px-3 py-1.5 text-slate-400 hover:text-white" href="./motorista.html">Motorista</a>
+          <a class="rounded-full border border-white/10 px-3 py-1.5 text-white" href="./admin.html">Admin</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="relative z-10 mx-auto max-w-6xl px-4 py-8">
+      <p id="supabase-banner" class="mb-6 hidden rounded-xl border border-csi-red/40 bg-csi-red/10 px-4 py-3 text-sm text-red-200"></p>
+
+      <section id="admin-gate" class="mx-auto max-w-md csi-card p-6">
+        <p class="text-xs uppercase tracking-[0.28em] text-csi-red">Acesso restrito</p>
+        <h1 class="mt-2 font-display text-3xl text-white">Autenticação do comando</h1>
+        <p class="mt-2 text-sm text-slate-400">Senha padrão inicial: <span class="font-mono text-red-300">1234</span></p>
+        <form id="admin-login" class="mt-5 space-y-3">
+          <label class="block text-sm">Senha
+            <input required type="password" name="pin" maxlength="8" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5 tracking-[0.3em]" />
+          </label>
+          <button type="submit" class="csi-cta w-full rounded-lg px-4 py-3 text-sm font-semibold">Entrar</button>
+          <p id="admin-login-error" class="hidden rounded-lg border border-csi-red/40 bg-csi-red/10 px-3 py-2 text-sm text-red-100">Senha inválida.</p>
+        </form>
+      </section>
+
+      <section id="admin-panel" class="hidden space-y-6">
+        <div class="flex flex-wrap gap-2" id="admin-tabs">
+          <button type="button" class="admin-tab is-active" data-admin-tab="overview">Visão geral</button>
+          <button type="button" class="admin-tab" data-admin-tab="clients">Clientes</button>
+          <button type="button" class="admin-tab" data-admin-tab="drivers">Motoristas</button>
+          <button type="button" class="admin-tab" data-admin-tab="missions">Missões</button>
+          <button type="button" class="admin-tab" data-admin-tab="tariffs">Tarifas</button>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-5">
+          <article class="csi-card p-4"><p class="text-xs text-slate-500">Missões</p><p id="stat-missions" class="font-display text-3xl text-white">0</p></article>
+          <article class="csi-card p-4"><p class="text-xs text-slate-500">Clientes</p><p id="stat-clients" class="font-display text-3xl text-white">0</p></article>
+          <article class="csi-card p-4"><p class="text-xs text-slate-500">Motoristas online</p><p id="stat-online" class="font-display text-3xl text-white">0</p></article>
+          <article class="csi-card p-4"><p class="text-xs text-slate-500">Pendências</p><p id="stat-pending" class="font-display text-3xl text-csi-red">0</p></article>
+          <article class="csi-card p-4"><p class="text-xs text-slate-500">Score médio</p><p id="stat-rating" class="font-display text-3xl text-amber-300">—</p></article>
+        </div>
+
+        <div data-admin-panel="overview" class="space-y-6">
+          <div class="grid gap-6 lg:grid-cols-3">
+            <article class="csi-card p-5">
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Mix de serviços</p>
+              <div class="chart-box mt-3"><canvas id="chart-admin-mix"></canvas></div>
+            </article>
+            <article class="csi-card p-5">
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Frota em campo</p>
+              <div class="chart-box mt-3"><canvas id="chart-admin-fleet"></canvas></div>
+            </article>
+            <article class="csi-card p-5">
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Score operacional</p>
+              <div class="chart-box mt-3"><canvas id="chart-admin-score"></canvas></div>
+            </article>
+          </div>
+          <article class="csi-card p-5">
+            <p class="text-xs uppercase tracking-[0.2em] text-csi-red">Central de pendências</p>
+            <p class="mt-1 text-sm text-slate-400">Novos cadastros e solicitações com atalho direto para a fila correspondente.</p>
+            <div id="overview-inbox" class="mt-4 space-y-2 text-sm"></div>
+          </article>
+        </div>
+
+        <div data-admin-panel="clients" class="hidden space-y-6">
+          <article class="csi-card p-5">
+            <p class="text-xs uppercase tracking-[0.2em] text-csi-red">Fila dinâmica · cadastros pendentes</p>
+            <p class="mt-1 text-sm text-slate-400">Dossiê completo some da fila ao aprovar ou recusar.</p>
+            <div id="client-triage" class="mt-4 space-y-3 text-sm"></div>
+          </article>
+          <article class="csi-card p-5">
+            <div class="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Base executiva · clientes</p>
+                <p class="mt-1 text-sm text-slate-400">Pesquisa e filtros sobre toda a base credenciada.</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <input id="client-search" type="search" placeholder="Buscar nome, e-mail, CPF…" class="exec-search" />
+                <select id="client-filter" class="exec-filter">
+                  <option value="all">Todos os status</option>
+                  <option value="pending">Pendentes</option>
+                  <option value="approved">Aprovados</option>
+                  <option value="rejected">Recusados</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-wrap mt-4">
+              <table class="exec-table">
+                <thead>
+                  <tr>
+                    <th>Foto</th>
+                    <th>Cliente</th>
+                    <th>CPF</th>
+                    <th>Contato</th>
+                    <th>Empresa</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="client-table-body"></tbody>
+              </table>
+            </div>
+          </article>
+        </div>
+
+        <div data-admin-panel="drivers" class="hidden space-y-6">
+          <article class="csi-card p-5">
+            <p class="text-xs uppercase tracking-[0.2em] text-csi-red">Fila dinâmica · credenciamento</p>
+            <p class="mt-1 text-sm text-slate-400">Foto facial, CPF e frota antes de credenciar. Sai da fila após a decisão.</p>
+            <div id="driver-triage" class="mt-4 space-y-3 text-sm"></div>
+          </article>
+          <article class="csi-card p-5">
+            <div class="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Base executiva · motoristas</p>
+                <p class="mt-1 text-sm text-slate-400">Status operacional em tempo real.</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <input id="driver-search" type="search" placeholder="Buscar nome, CPF, placa…" class="exec-search" />
+                <select id="driver-filter" class="exec-filter">
+                  <option value="all">Todos os status</option>
+                  <option value="online">Online</option>
+                  <option value="busy">Busy</option>
+                  <option value="offline">Offline</option>
+                  <option value="pending">Em triagem</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-wrap mt-4">
+              <table class="exec-table">
+                <thead>
+                  <tr>
+                    <th>Foto</th>
+                    <th>Operador</th>
+                    <th>CPF</th>
+                    <th>Praça</th>
+                    <th>Veículo / placa</th>
+                    <th>Status</th>
+                    <th>Credencial</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="driver-table-body"></tbody>
+              </table>
+            </div>
+          </article>
+        </div>
+
+        <div data-admin-panel="missions" class="hidden space-y-6">
+          <article class="csi-card p-5">
+            <p class="text-xs uppercase tracking-[0.2em] text-csi-red">Fila dinâmica · novas solicitações</p>
+            <p class="mt-1 text-sm text-slate-400">Alocar um motorista online no card e gerar o contrato. Aprovado ou recusado some da fila e atualiza os gráficos.</p>
+            <div id="request-triage" class="mt-4 space-y-3 text-sm"></div>
+          </article>
+          <article class="csi-card p-5">
+            <div class="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Base executiva · missões</p>
+                <p class="mt-1 text-sm text-slate-400">Contratos, anexos, avaliação e liberação operacional.</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <input id="mission-search" type="search" placeholder="Buscar cliente, rota, protocolo…" class="exec-search" />
+                <select id="mission-filter" class="exec-filter">
+                  <option value="all">Todos os status</option>
+                  <option value="pending">Pendentes</option>
+                  <option value="approved">Aprovadas</option>
+                  <option value="em_analise_contrato">Aguardando Validação do Gestor</option>
+                  <option value="agendado_liberado">Liberadas</option>
+                  <option value="completed">Concluídas</option>
+                  <option value="rejected">Recusadas</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-wrap mt-4">
+              <table class="exec-table">
+                <thead>
+                  <tr>
+                    <th>Protocolo</th>
+                    <th>Cliente / rota</th>
+                    <th>Operador</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                    <th>Score</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="mission-table-body"></tbody>
+              </table>
+            </div>
+          </article>
+        </div>
+
+        <div data-admin-panel="tariffs" class="hidden space-y-6">
+          <article class="csi-card p-5">
+            <p class="text-xs uppercase tracking-[0.2em] text-csi-red">Tabela de tarifas</p>
+            <h2 class="mt-1 font-display text-3xl text-white">Valor/hora operacional</h2>
+            <p class="mt-2 text-sm text-slate-400">Esses parâmetros alimentam o simulador do app do cliente em tempo real via <span class="font-mono text-slate-300">system_settings</span>.</p>
+            <form id="tariff-form" class="mt-5 grid gap-4 sm:grid-cols-2">
+              <label class="block text-sm">Motorista Desarmado (R$/hora)
+                <input required type="number" min="1" step="0.01" name="hourly_unarmed" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <label class="block text-sm">Motorista Armado (R$/hora)
+                <input required type="number" min="1" step="0.01" name="hourly_armed" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <label class="block text-sm">Chave Pix
+                <input required name="pix_key" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <label class="block text-sm">Nome no Pix
+                <input required name="pix_name" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <label class="block text-sm sm:col-span-2">Cidade no Pix
+                <input required name="pix_city" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <button type="submit" class="csi-cta sm:col-span-2 rounded-lg px-4 py-3 text-sm font-semibold">Salvar tarifas</button>
+            </form>
+          </article>
+        </div>
+      </section>
+
+      <div id="admin-edit-modal" class="modal-backdrop">
+        <div class="csi-card max-h-[85vh] w-full max-w-lg overflow-y-auto p-6">
+          <p class="text-xs uppercase tracking-[0.2em] text-csi-red">Edição operacional</p>
+          <h3 id="admin-edit-title" class="mt-1 font-display text-2xl text-white">Editar registro</h3>
+          <form id="admin-edit-form" class="mt-4 space-y-3"></form>
+          <div class="mt-5 flex gap-2">
+            <button type="button" id="admin-edit-cancel" class="flex-1 rounded-lg border border-white/15 px-4 py-2.5 text-sm">Cancelar</button>
+            <button type="submit" form="admin-edit-form" class="csi-cta flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold">Salvar</button>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+    <script src="./contract-template.js?v=20261019g"></script>
+    <script src="./supabaseClient.js?v=20261019g"></script>
+    <script src="./app.js?v=20261019i"></script>
+  </body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#05070c" />
+    <title>CSI Mobility · Acesso Executivo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: { csi: { bg: "#05070c", card: "#131827", blue: "#1e3a8a", red: "#dc2626" } },
+            fontFamily: { sans: ["Manrope", "ui-sans-serif", "system-ui"], display: ["Barlow Condensed", "sans-serif"] },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="./styles.css?v=20261019j" />
+  </head>
+  <body class="font-sans antialiased" data-page="hub">
+    <div class="hub">
+      <header class="hub-header">
+        <img src="./logo-csi.png" alt="CSI International Security Consulting" class="hub-logo" />
+        <p class="hub-kicker">International Security Consulting</p>
+        <h1 class="hub-title">CSI MOBILITY</h1>
+        <p class="hub-subtitle">Segurança e transporte executivo</p>
+      </header>
+
+      <main class="hub-main">
+        <div class="hub-grid">
+          <article class="hub-card">
+            <div class="hub-card__media" style="background-image: url('./hub-cliente.jpg')"></div>
+            <div class="hub-card__shade"></div>
+            <div class="hub-card__body">
+              <p class="hub-card__label">Portal exclusivo</p>
+              <h2 class="hub-card__title">CLIENTE — SOLICITAR ESCOLTA EXECUTIVA</h2>
+              <p class="hub-card__text">Agenda VIP, contrato digital, sinal via Pix e acompanhamento da missão.</p>
+              <a href="./cliente.html" class="hub-cta">Portal do Cliente — Login / Cadastro</a>
+            </div>
+          </article>
+
+          <article class="hub-card">
+            <div class="hub-card__media" style="background-image: url('./hub-operador.jpg')"></div>
+            <div class="hub-card__shade"></div>
+            <div class="hub-card__body">
+              <p class="hub-card__label">Campo operacional</p>
+              <h2 class="hub-card__title">OPERADOR — GESTÃO OPERACIONAL / SEGURANÇA</h2>
+              <p class="hub-card__text">Status em tempo real, praça de atuação, GPS e protocolo de emergência.</p>
+              <a href="./motorista.html" class="hub-cta">Área do Operador — Login / Cadastro</a>
+            </div>
+          </article>
+        </div>
+      </main>
+
+      <footer class="hub-footer">
+        <a href="./admin.html" class="hub-admin">Administrador</a>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSI Mobility · Motorista</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              csi: { dark: "#0b0f19", card: "#131827", blue: "#1e3a8a", red: "#dc2626" },
+            },
+            fontFamily: {
+              display: ["Barlow Condensed", "sans-serif"],
+              sans: ["Inter", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="bg-csi-dark text-slate-200 font-sans antialiased" data-page="driver">
+    <div class="noise"></div>
+    <header class="sticky top-0 z-40 border-b border-white/5 bg-[#0b0f19]/90 backdrop-blur">
+      <div class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+        <a href="./index.html" class="flex min-w-0 items-center gap-3">
+          <span class="csi-logo-wrap"><img src="./logo-csi.png" alt="CSI International Security Consulting" class="csi-logo" /></span>
+          <div class="min-w-0">
+            <p class="brand-kicker truncate text-[10px] uppercase tracking-[0.22em] text-csi-red">International Security Consulting</p>
+            <p class="font-display text-lg leading-none tracking-wide text-white">APP DO MOTORISTA</p>
+          </div>
+        </a>
+        <div class="flex items-center gap-2">
+          <button id="driver-logout" type="button" class="hidden rounded-full border border-white/10 px-3 py-1.5 text-xs text-slate-300 hover:text-white">Sair</button>
+          <nav class="hidden items-center gap-2 text-xs sm:flex">
+            <a class="rounded-full px-3 py-1.5 text-slate-400 hover:text-white" href="./cliente.html">Cliente</a>
+            <a class="rounded-full border border-white/10 px-3 py-1.5 text-white" href="./motorista.html">Motorista</a>
+            <a class="rounded-full px-3 py-1.5 text-slate-400 hover:text-white" href="./admin.html">Admin</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="relative z-10 mx-auto max-w-5xl px-4 py-8">
+      <p id="supabase-banner" class="mb-6 hidden rounded-xl border border-csi-red/40 bg-csi-red/10 px-4 py-3 text-sm text-red-200"></p>
+
+      <div id="driver-auth" class="grid gap-6 lg:grid-cols-2">
+        <section class="csi-card p-6">
+          <p class="text-xs uppercase tracking-[0.28em] text-csi-red">Cadastro inicial</p>
+          <h1 class="mt-2 font-display text-3xl text-white">Novo operador</h1>
+          <p class="mt-2 text-sm text-slate-400">CPF, PIN de 6 dígitos e reconhecimento facial são obrigatórios. O dossiê vai para triagem.</p>
+          <form id="driver-register" class="mt-5 space-y-3">
+            <label class="block text-sm">Nome completo
+              <input required name="full_name" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+            </label>
+            <label class="block text-sm">CPF
+              <input required name="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+            </label>
+            <label class="block text-sm">E-mail
+              <input required type="email" name="email" autocomplete="username" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+            </label>
+            <label class="block text-sm">PIN de 6 dígitos
+              <input required type="password" name="password" maxlength="6" minlength="6" inputmode="numeric" autocomplete="new-password" class="pin-track mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+            </label>
+            <label class="block text-sm">Confirmar PIN
+              <input required type="password" name="password_confirm" maxlength="6" minlength="6" inputmode="numeric" autocomplete="new-password" class="pin-track mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+            </label>
+            <label class="block text-sm">Telefone
+              <input required name="phone" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+            </label>
+            <label class="block text-sm">Veículo
+              <input name="vehicle_type" placeholder="SUV / Sedan / Blindado" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+            </label>
+            <label class="block text-sm">Placa
+              <input name="vehicle_plate" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+            </label>
+            <label class="block text-sm">Estado de atuação
+              <select required name="base_state" class="region-state mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5">
+                <option value="">Selecione</option>
+                <option value="GO">Goiás - GO</option>
+                <option value="DF">Distrito Federal - DF</option>
+              </select>
+            </label>
+            <label class="block text-sm">Cidade / região de base
+              <select required name="base_city" class="region-city mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5">
+                <option value="">Selecione o estado</option>
+              </select>
+            </label>
+            <div>
+              <p class="text-sm">Reconhecimento facial</p>
+              <div class="camera-stage relative mt-2 overflow-hidden rounded-2xl border border-white/10 bg-black">
+                <div id="driver-camera-placeholder" class="flex h-56 flex-col items-center justify-center gap-3 px-6 text-center">
+                  <p class="text-sm text-slate-400">Clique no botão abaixo para ligar a câmera e autorizar o uso da imagem.</p>
+                  <button type="button" id="driver-start-camera" class="csi-cta rounded-lg px-5 py-3 text-sm font-semibold">Iniciar Câmera</button>
+                </div>
+                <video id="driver-kyc-video" class="hidden h-56 w-full object-cover" playsinline muted></video>
+                <canvas id="driver-kyc-canvas" class="hidden"></canvas>
+                <div id="driver-camera-guide" class="pointer-events-none absolute inset-8 hidden rounded-[40%] border-2 border-csi-red/70"></div>
+              </div>
+              <p id="driver-face-status" class="mt-2 text-sm text-slate-400">Clique em Iniciar Câmera para autorizar o acesso.</p>
+              <button type="button" id="driver-kyc-capture" disabled class="capture-btn mt-3 w-full rounded-lg border border-csi-red/40 px-4 py-2.5 text-sm text-red-200">Capturar face</button>
+            </div>
+            <button type="submit" class="csi-cta w-full rounded-lg px-4 py-3 text-sm font-semibold">Enviar para triagem</button>
+          </form>
+        </section>
+
+        <section class="csi-card p-6">
+          <p class="text-xs uppercase tracking-[0.28em] text-csi-red">Acesso operacional</p>
+          <h2 class="mt-2 font-display text-3xl text-white">Já credenciado?</h2>
+          <p class="mt-2 text-sm text-slate-400">Entre com o e-mail e o PIN de 6 dígitos após a liberação do admin.</p>
+          <form id="driver-login" class="mt-5 space-y-3">
+            <label class="block text-sm">E-mail
+              <input required type="email" name="email" autocomplete="username" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+            </label>
+            <label class="block text-sm">PIN de 6 dígitos
+              <input required type="password" name="password" maxlength="6" minlength="6" inputmode="numeric" autocomplete="current-password" class="pin-track mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+            </label>
+            <button type="submit" class="csi-cta w-full rounded-lg px-4 py-3 text-sm font-semibold">Entrar no painel</button>
+          </form>
+          <p id="driver-auth-msg" class="mt-4 hidden rounded-lg border border-csi-red/40 bg-csi-red/10 px-3 py-3 text-sm text-red-100"></p>
+        </section>
+      </div>
+
+      <section id="driver-pending" class="mt-8 hidden csi-card p-6">
+        <p class="text-xs uppercase tracking-[0.28em] text-amber-400">Aguardando credenciamento</p>
+        <h2 class="mt-1 font-display text-3xl text-white">Cadastro em triagem pelo comando. Aguarde aprovação</h2>
+        <p class="mt-2 text-sm text-slate-400">Assim que o comando aprovar, use o PIN nesta página para abrir o painel de trabalho.</p>
+      </section>
+
+      <section id="driver-panel" class="mt-8 hidden space-y-6">
+        <div class="csi-card flex flex-wrap items-center justify-between gap-3 p-5">
+          <div>
+            <p class="text-xs uppercase tracking-[0.28em] text-csi-red">Status operacional</p>
+            <h2 id="driver-name" class="font-display text-3xl text-white">Operador</h2>
+            <p id="driver-praca" class="mt-1 text-sm text-slate-400">Praça de atuação</p>
+          </div>
+          <div class="flex gap-2">
+            <button data-status="online" class="rounded-lg bg-emerald-600 px-3 py-2 text-sm text-white">Online</button>
+            <button data-status="busy" class="rounded-lg bg-amber-500 px-3 py-2 text-sm text-black">Busy</button>
+            <button data-status="offline" class="rounded-lg border border-white/15 px-3 py-2 text-sm">Offline</button>
+          </div>
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-2">
+          <article class="csi-card p-5">
+            <p class="text-xs uppercase tracking-[0.2em] text-slate-500">GPS</p>
+            <p id="driver-gps" class="mt-2 font-mono text-sm text-slate-300">Aguardando localização…</p>
+            <button id="driver-gps-btn" class="mt-4 rounded-lg border border-white/15 px-4 py-2 text-sm">Atualizar GPS</button>
+          </article>
+          <article class="csi-card p-5">
+            <p class="text-xs uppercase tracking-[0.2em] text-csi-red">Senha de coação</p>
+            <p class="mt-2 text-sm text-slate-400">Use o PIN de pânico 9110 em emergência. PIN de coação 0000 envia alerta silencioso.</p>
+            <form id="panic-form" class="mt-4 flex gap-2">
+              <input name="pin" maxlength="4" placeholder="PIN" class="w-28 rounded-lg border border-csi-red/40 bg-black/30 px-3 py-2 text-center tracking-[0.4em]" />
+              <button type="submit" class="csi-cta rounded-lg px-4 py-2 text-sm font-semibold">Disparar</button>
+            </form>
+            <p id="panic-msg" class="mt-3 hidden rounded-lg border border-csi-red/50 bg-csi-red/15 px-3 py-2 text-sm text-red-100"></p>
+          </article>
+        </div>
+
+        <article class="csi-card p-5">
+          <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Histórico de missões</p>
+          <div id="driver-jobs" class="mt-4 space-y-2 text-sm"></div>
+        </article>
+      </section>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./supabaseClient.js?v=20261019g"></script>
+    <script src="./app.js?v=20261019i"></script>
+  </body>
+</html>

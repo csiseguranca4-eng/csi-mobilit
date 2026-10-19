@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSI Mobility · Cliente</title>
+    <meta name="description" content="KYC, vestuário, perfil de segurança e orçamento CSI Mobility." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              csi: { dark: "#0b0f19", card: "#131827", blue: "#1e3a8a", red: "#dc2626" },
+            },
+            fontFamily: {
+              display: ["Barlow Condensed", "sans-serif"],
+              sans: ["Inter", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="bg-csi-dark text-slate-200 font-sans antialiased" data-page="client">
+    <div class="noise"></div>
+    <header class="sticky top-0 z-40 border-b border-white/5 bg-[#0b0f19]/90 backdrop-blur">
+      <div class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+        <a href="./index.html" class="flex min-w-0 items-center gap-3">
+          <span class="csi-logo-wrap"><img src="./logo-csi.png" alt="CSI International Security Consulting" class="csi-logo" /></span>
+          <div class="min-w-0">
+            <p class="brand-kicker truncate text-[10px] uppercase tracking-[0.22em] text-csi-red">International Security Consulting</p>
+            <p class="font-display text-lg leading-none tracking-wide text-white">APP DO CLIENTE</p>
+          </div>
+        </a>
+        <div class="flex items-center gap-2">
+          <p id="client-session-label" class="hidden max-w-[12rem] truncate text-[11px] text-slate-400 sm:block"></p>
+          <button id="client-logout" type="button" class="hidden rounded-full border border-white/10 px-3 py-1.5 text-xs text-slate-300 hover:text-white">Sair</button>
+          <nav class="hidden items-center gap-2 text-xs sm:flex">
+            <a class="rounded-full border border-white/10 px-3 py-1.5 text-white" href="./cliente.html">Cliente</a>
+            <a class="rounded-full px-3 py-1.5 text-slate-400 hover:text-white" href="./motorista.html">Motorista</a>
+            <a class="rounded-full px-3 py-1.5 text-slate-400 hover:text-white" href="./admin.html">Admin</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="relative z-10 mx-auto max-w-6xl px-4 py-8">
+      <p id="supabase-banner" class="mb-6 hidden rounded-xl border border-csi-red/40 bg-csi-red/10 px-4 py-3 text-sm text-red-200"></p>
+
+      <section id="client-welcome" class="grid gap-6 lg:grid-cols-2">
+        <article class="csi-card p-6 md:p-8">
+          <p class="text-xs uppercase tracking-[0.28em] text-csi-red">Novo cadastro / KYC</p>
+          <h1 class="mt-2 font-display text-4xl text-white">Credenciamento</h1>
+          <p class="mt-2 text-sm text-slate-400">Identidade, CPF, PIN de 6 dígitos e verificação facial. O painel só abre depois da aprovação do comando.</p>
+          <button id="start-kyc" type="button" class="csi-cta mt-6 w-full rounded-lg px-4 py-3 text-sm font-semibold">Iniciar cadastro KYC</button>
+        </article>
+        <article class="csi-card p-6 md:p-8">
+          <p class="text-xs uppercase tracking-[0.28em] text-csi-red">Já cadastrado</p>
+          <h2 class="mt-2 font-display text-4xl text-white">Login rápido</h2>
+          <p class="mt-2 text-sm text-slate-400">Entre com o e-mail e o PIN de 6 dígitos definidos no credenciamento.</p>
+          <form id="client-login" class="mt-6 space-y-4">
+            <label class="block text-sm">E-mail
+              <input required type="email" name="email" autocomplete="username" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+            </label>
+            <label class="block text-sm">PIN de 6 dígitos
+              <input required name="pin" maxlength="6" minlength="6" inputmode="numeric" autocomplete="current-password" class="pin-track mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+            </label>
+            <button type="submit" class="csi-cta w-full rounded-lg px-4 py-3 text-sm font-semibold">Entrar</button>
+          </form>
+          <p id="client-login-msg" class="mt-4 hidden rounded-lg border border-csi-red/40 bg-csi-red/10 px-3 py-3 text-sm text-red-100"></p>
+        </article>
+      </section>
+
+      <section id="kyc-gate" class="csi-card mx-auto mt-8 hidden max-w-3xl p-6 md:p-8">
+        <p class="text-xs uppercase tracking-[0.28em] text-csi-red">Onboarding · KYC</p>
+        <h1 class="mt-2 font-display text-4xl text-white">Credenciamento do passageiro</h1>
+        <p class="mt-2 text-sm text-slate-400">Identidade, empresa, PIN e verificação facial são obrigatórios antes da triagem.</p>
+        <div class="mt-6 flex gap-2" id="kyc-steps">
+          <span class="step-dot is-active" data-kyc-dot="1">1</span>
+          <span class="step-dot" data-kyc-dot="2">2</span>
+          <span class="step-dot" data-kyc-dot="3">3</span>
+        </div>
+
+        <form id="kyc-form" class="mt-6 space-y-5" novalidate>
+          <div data-kyc-step="1" class="space-y-4">
+            <div class="grid gap-4 sm:grid-cols-2">
+              <label class="block text-sm">Nome completo
+                <input required name="full_name" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <label class="block text-sm">E-mail corporativo
+                <input required type="email" name="email" autocomplete="username" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <label class="block text-sm">PIN de 6 dígitos
+                <input required name="password" type="password" maxlength="6" minlength="6" inputmode="numeric" autocomplete="new-password" class="pin-track mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <label class="block text-sm">Confirmar PIN
+                <input required name="password_confirm" type="password" maxlength="6" minlength="6" inputmode="numeric" autocomplete="new-password" class="pin-track mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <label class="block text-sm">CPF
+                <input required name="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <label class="block text-sm">Telefone
+                <input required name="phone" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <label class="block text-sm">Empresa
+                <input required name="company" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <label class="block text-sm">Endereço
+                <input name="address" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+            </div>
+            <div class="flex gap-3">
+              <button type="button" id="kyc-back-welcome" class="flex-1 rounded-lg border border-white/15 px-4 py-3 text-sm">Voltar</button>
+              <button type="button" data-kyc-next="2" class="csi-cta flex-1 rounded-lg px-4 py-3 text-sm font-semibold">Continuar</button>
+            </div>
+          </div>
+
+          <div data-kyc-step="2" class="hidden space-y-4">
+            <label class="block text-sm">Tipo de documento
+              <select name="document_type" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5">
+                <option value="rg">RG</option>
+                <option value="cnh">CNH</option>
+                <option value="passport">Passaporte</option>
+              </select>
+            </label>
+            <label class="block text-sm">Número do documento
+              <input required name="document_id" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+            </label>
+            <label class="block text-sm">Foto do documento
+              <input type="file" accept="image/*" name="document_file" class="mt-1 w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-csi-red file:px-3 file:py-2 file:text-white" />
+            </label>
+            <div class="flex gap-3">
+              <button type="button" data-kyc-next="1" class="flex-1 rounded-lg border border-white/15 px-4 py-3 text-sm">Voltar</button>
+              <button type="button" data-kyc-next="3" class="csi-cta flex-1 rounded-lg px-4 py-3 text-sm font-semibold">Continuar</button>
+            </div>
+          </div>
+
+          <div data-kyc-step="3" class="hidden space-y-4">
+            <p class="text-sm text-slate-400">A câmera só inicia depois que você autorizar o acesso no navegador.</p>
+            <div class="camera-stage relative overflow-hidden rounded-2xl border border-white/10 bg-black">
+              <div id="kyc-camera-placeholder" class="flex h-64 flex-col items-center justify-center gap-3 px-6 text-center">
+                <p class="text-sm text-slate-400">Clique no botão abaixo para ligar a câmera e autorizar o uso da imagem.</p>
+                <button type="button" id="kyc-start-camera" class="csi-cta rounded-lg px-5 py-3 text-sm font-semibold">Iniciar Câmera</button>
+              </div>
+              <video id="kyc-video" class="hidden h-64 w-full object-cover" playsinline muted></video>
+              <canvas id="kyc-canvas" class="hidden"></canvas>
+              <div id="kyc-camera-guide" class="pointer-events-none absolute inset-8 hidden rounded-[40%] border-2 border-csi-red/70"></div>
+            </div>
+            <p id="kyc-face-status" class="text-sm text-slate-400">Clique em Iniciar Câmera para autorizar o acesso.</p>
+            <div class="flex gap-3">
+              <button type="button" data-kyc-next="2" class="rounded-lg border border-white/15 px-4 py-3 text-sm">Voltar</button>
+              <button type="button" id="kyc-capture" disabled class="capture-btn flex-1 rounded-lg border border-csi-red/40 px-4 py-3 text-sm text-red-200">Capturar face</button>
+              <button type="submit" class="csi-cta flex-1 rounded-lg px-4 py-3 text-sm font-semibold">Enviar KYC</button>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <section id="client-pending" class="mx-auto mt-8 hidden max-w-3xl csi-card p-6 md:p-8">
+        <p class="text-xs uppercase tracking-[0.28em] text-amber-400">Triagem</p>
+        <h2 class="mt-2 font-display text-4xl text-white">Cadastro em triagem pelo comando. Aguarde aprovação</h2>
+        <p class="mt-3 text-sm text-slate-400">O painel de missões permanece bloqueado até o centro de comando aprovar o dossiê. Você pode sair e usar o login rápido depois da liberação.</p>
+      </section>
+
+      <section id="client-app" class="mt-8 hidden space-y-8">
+        <p id="kyc-success" class="hidden rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200" role="status"></p>
+        <p id="mission-success" class="hidden rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200" role="status"></p>
+
+        <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+          <div class="csi-card p-6">
+            <p class="text-xs uppercase tracking-[0.28em] text-csi-red">Agendamento antecipado</p>
+            <h2 class="mt-1 font-display text-3xl text-white">Nova missão</h2>
+            <form id="mission-form" class="mt-5 grid gap-4 sm:grid-cols-2">
+              <label class="block text-sm sm:col-span-2">Serviço
+                <select name="service_type" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5">
+                  <option value="executive_transport">Deslocamento Executivo</option>
+                  <option value="vip_escort">Escolta VIP</option>
+                  <option value="event_coverage">Cobertura de Eventos</option>
+                </select>
+              </label>
+              <label class="block text-sm">Data
+                <input required type="date" name="mission_date" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <label class="block text-sm">Horário
+                <input required type="time" name="mission_time" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <label class="block text-sm">Estado de origem
+                <select required name="origin_state" class="region-state mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5">
+                  <option value="">Selecione</option>
+                  <option value="GO">Goiás - GO</option>
+                  <option value="DF">Distrito Federal - DF</option>
+                </select>
+              </label>
+              <label class="block text-sm">Cidade / região de origem
+                <select required name="origin_city" class="region-city mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5">
+                  <option value="">Selecione o estado</option>
+                </select>
+              </label>
+              <label class="block text-sm sm:col-span-2">Local de origem
+                <input required name="pickup" placeholder="Hotel / aeroporto / residência" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <label class="block text-sm">Estado de destino
+                <select required name="dest_state" class="region-state mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5">
+                  <option value="">Selecione</option>
+                  <option value="GO">Goiás - GO</option>
+                  <option value="DF">Distrito Federal - DF</option>
+                </select>
+              </label>
+              <label class="block text-sm">Cidade / região de destino
+                <select required name="dest_city" class="region-city mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5">
+                  <option value="">Selecione o estado</option>
+                </select>
+              </label>
+              <label class="block text-sm sm:col-span-2">Local de destino
+                <input required name="dropoff" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <label class="block text-sm">Passageiros
+                <input type="number" min="1" max="12" name="passengers" value="1" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <label class="block text-sm">Distância estimada (km)
+                <input type="number" min="1" name="distance_km" value="18" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <label class="block text-sm sm:col-span-2">Duração estimada (horas)
+                <input type="number" min="1" step="0.5" name="duration_hours" value="2" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+              <label class="block text-sm sm:col-span-2">Observações
+                <textarea name="notes" rows="2" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5"></textarea>
+              </label>
+
+              <fieldset class="sm:col-span-2">
+                <legend class="text-sm text-slate-300">Filtro de vestuário</legend>
+                <div class="mt-2 grid gap-2 sm:grid-cols-3">
+                  <label class="service-option cursor-pointer">
+                    <input type="radio" name="attire" value="terno_completo" class="sr-only" checked />
+                    <span class="csi-card block p-3 text-sm">Terno Completo</span>
+                  </label>
+                  <label class="service-option cursor-pointer">
+                    <input type="radio" name="attire" value="esporte_fino" class="sr-only" />
+                    <span class="csi-card block p-3 text-sm">Esporte Fino</span>
+                  </label>
+                  <label class="service-option cursor-pointer">
+                    <input type="radio" name="attire" value="paisana" class="sr-only" />
+                    <span class="csi-card block p-3 text-sm">À Paisana</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset class="sm:col-span-2">
+                <legend class="text-sm text-slate-300">Perfil de segurança</legend>
+                <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                  <label class="service-option cursor-pointer">
+                    <input type="radio" name="security_profile" value="unarmed" class="sr-only" checked />
+                    <span class="csi-card block p-3 text-sm">Motorista Desarmado</span>
+                  </label>
+                  <label class="service-option cursor-pointer">
+                    <input type="radio" name="security_profile" value="armed_tactical" class="sr-only" />
+                    <span class="csi-card block p-3 text-sm">Porte de Armas / Escolta Tática</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset class="sm:col-span-2">
+                <legend class="text-sm text-slate-300">Veículo próprio do cliente</legend>
+                <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                  <label class="service-option cursor-pointer">
+                    <input type="radio" name="client_own_vehicle" value="no" class="sr-only" checked />
+                    <span class="csi-card block p-3 text-sm">Não — operador CSI conduz frota própria</span>
+                  </label>
+                  <label class="service-option cursor-pointer">
+                    <input type="radio" name="client_own_vehicle" value="yes" class="sr-only" />
+                    <span class="csi-card block p-3 text-sm">Sim — motorista conduz o automóvel do cliente</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <label class="block text-sm sm:col-span-2">Preferência de operador (nome)
+                <input name="preferred_driver_name" placeholder="Ex.: Hudson" class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2.5" />
+              </label>
+
+              <button type="submit" class="csi-cta sm:col-span-2 rounded-lg px-4 py-3 text-sm font-semibold">Solicitar e gerar protocolo</button>
+            </form>
+          </div>
+
+          <aside class="csi-card p-6">
+            <p class="text-xs uppercase tracking-[0.28em] text-csi-red">Simulador</p>
+            <h3 class="mt-1 font-display text-2xl text-white">Orçamento real</h3>
+            <p id="quote-total" class="mt-4 font-display text-5xl text-white">R$ 0</p>
+            <ul id="quote-breakdown" class="mt-4 space-y-2 text-sm text-slate-400"></ul>
+            <p id="quote-deposit" class="mt-4 text-sm text-red-200"></p>
+            <div class="mt-6 space-y-5">
+              <div>
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Ações pendentes</p>
+                <div id="client-jobs-active" class="mt-3 space-y-2 text-sm"></div>
+              </div>
+              <div>
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Histórico</p>
+                <div id="client-jobs-history" class="mt-3 space-y-2 text-sm"></div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+    <script src="./contract-template.js?v=20261019g"></script>
+    <script src="./supabaseClient.js?v=20261019g"></script>
+    <script src="./app.js?v=20261019i"></script>
+  </body>
+</html>
